@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: "contacts"
+      MYSQL_USER: "contacts"
+      MYSQL_PASSWORD: "secret"
+    ports:
+      - 3306:3306
+    volumes:
+      - "./dump.sql:/docker-entrypoint-initdb.d/dump.sql"
