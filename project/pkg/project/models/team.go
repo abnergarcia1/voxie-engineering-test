@@ -1,9 +1,11 @@
 package models
 
+import "time"
+
 type Team struct{
-	ID        int       `json:"id,omitempty"`
+	ID        int       `json:"id"`
 	Name      string    `json:"name"`
-	CreatedAt string `json:"created_at,omitempty"`
-	UpdatedAt string `json:"updated_at,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 	Contacts []Contact  `json:"contacts,omitempty"`
 }

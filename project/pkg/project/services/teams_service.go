@@ -6,7 +6,9 @@ import (
 	"fmt"
 )
 
-type TeamService struct{}
+type TeamService struct{
+	contactService ContactService
+}
 
 func(s *TeamService) CreateTeam(team models.Team)(err error){
 	db, err:=getDB()
@@ -23,10 +25,26 @@ func(s *TeamService) CreateTeam(team models.Team)(err error){
 	}
 	defer strCommand.Close()
 
-	_,err = strCommand.Exec(team.Name, time.Now(), time.Now())
+	res,err := strCommand.Exec(team.Name, time.Now(), time.Now())
 	if err!=nil{
 		fmt.Println(err)
 		return
+	}
+
+	teamID,err:=res.LastInsertId()
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+
+	for _,contact:=range team.Contacts{
+
+		contact.TeamID=int(teamID)
+		err=s.contactService.CreateContact(contact,db)
+		if err!=nil{
+			fmt.Println(err)
+			return
+		}
 	}
 
 	return
@@ -40,7 +58,7 @@ func(s *TeamService) DeleteTeam(idTeam int)(err error){
 	}
 	defer db.Close()
 
-	strCommand, err:=db.Prepare("DELETE FROM teams WHERE ID=?")
+	strCommand, err:=db.Prepare("DELETE FROM teams WHERE id=?")
 	if err!=nil{
 		fmt.Println(err)
 		return
@@ -52,6 +70,8 @@ func(s *TeamService) DeleteTeam(idTeam int)(err error){
 		fmt.Println(err)
 		return
 	}
+
+
 
 	return
 }
@@ -66,7 +86,7 @@ func(s *TeamService) GetTeams()(teams []models.Team, err error){
 	}
 	defer db.Close()
 
-	dataRows, err:=db.Query("SELECT id, name, created_at, updated_at FROM teams")
+	dataRows, err:=db.Query("SELECT id, `name`, created_at, updated_at FROM teams ORDER BY `name` ASC")
 	if err!=nil{
 		fmt.Println(err)
 		return
@@ -85,6 +105,12 @@ func(s *TeamService) GetTeams()(teams []models.Team, err error){
 
 	}
 
+	for _,team:=range teams{
+		team.Contacts,err=s.contactService.GetContacts(team.ID,db)
+		if err!=nil{
+			return
+		}
+	}
 	return
 }
 
@@ -98,7 +124,7 @@ func(s *TeamService) GetTeam(teamID int)(team models.Team, err error){
 	}
 	defer db.Close()
 
-	dataRows, err:=db.Query("SELECT id, name, created_at, updated_at FROM teams WHERE id=?", teamID)
+	dataRows, err:=db.Query("SELECT id, `name`, created_at, updated_at FROM teams WHERE id=? ", teamID)
 	if err!=nil{
 		fmt.Println(err)
 		return
@@ -111,6 +137,32 @@ func(s *TeamService) GetTeam(teamID int)(team models.Team, err error){
 			fmt.Println(err)
 			break
 		}
+	}
+
+	team.Contacts,err=s.contactService.GetContacts(team.ID,db)
+
+	return
+}
+
+func(s *TeamService) UpdateTeam(team models.Team)(err error){
+	db, err:=getDB()
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+	defer db.Close()
+
+	strCommand, err:=db.Prepare("UPDATE teams SET `name`=?, updated_at=? WHERE id=?")
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+	defer strCommand.Close()
+
+	_,err = strCommand.Exec(team.Name, time.Now(), team.ID)
+	if err!=nil{
+		fmt.Println(err)
+		return
 	}
 
 	return

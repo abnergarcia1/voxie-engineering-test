@@ -12,7 +12,7 @@ func getDB() (db *sql.DB, e error) {
 	host := "tcp(localhost:3306)"
 	dbName := "contacts"
 
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s", user, pass, host, dbName))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s?parseTime=true", user, pass, host, dbName))
 	if err != nil {
 		return nil, err
 	}
