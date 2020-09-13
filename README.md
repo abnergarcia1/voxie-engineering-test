@@ -67,8 +67,7 @@ build                         Build the current go project
 run                           Run the current go project
 ```
 
-##You need to run the project and after that, access to http://localhost:8000/webclient/ in order to access to the page to view contacts, teams
-and custom attributes
+## You need to run the project and after that, access to http://localhost:8000/webclient/ in order to access to the page to view contacts, teams and custom attributes
 
 Feel free to place all of your project work into the `project` directory within this repository.
 
