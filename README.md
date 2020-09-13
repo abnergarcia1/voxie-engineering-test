@@ -62,7 +62,13 @@ There is a Makefile provided for your convenience — just run `make [command]` 
 db                            Start local development mysql database on :3306
 import-linux                  Send an import JSON request to :8000/import on a linux-platform
 import                        Send an import JSON request to :8000/import
+
+build                         Build the current go project
+run                           Run the current go project
 ```
+
+##You need to run the project and after that, access to http://localhost:8000/webclient/ in order to access to the page to view contacts, teams
+and custom attributes
 
 Feel free to place all of your project work into the `project` directory within this repository.
 
